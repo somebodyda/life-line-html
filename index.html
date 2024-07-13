@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+      }
+      body {
+        /* overflow: hidden; */
+        overflow-x: hidden;
+      }
+      .container {
+        height: 100vh;
+        width: 100vw;
+        background: black;
+      }
+      .another-container {
+        height: 100vh;
+        width: 100vw;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- <div class="another-container"></div> -->
+    <div class="container"></div>
+    <!-- <div class="another-container"></div> -->
+    <script>
+      const container = document.querySelector(".container"); // Get the container element
+      const canvas = document.createElement("canvas");
+      const c = canvas.getContext("2d");
+
+      canvas.width = container.clientWidth; // Set canvas width to match container
+      canvas.height = container.clientHeight; // Set canvas height to match container
+      container.appendChild(canvas); // Append canvas to the container
+
+      class Dot {
+        constructor(id, x, y, theta, parent, colorChoose) {
+          this.x = x;
+          this.y = y;
+          this.t = theta;
+          this.t = Math.random() * Math.cos(this.t) * 100;
+          this.vx = Math.sin(this.t);
+          this.vy = Math.cos(this.t);
+          this.col = colorChoose;
+          this.parent = parent;
+          this.id = id;
+          this.alpha = 0.2;
+        }
+
+        draw() {
+          this.x -= this.vx;
+          this.y -= this.vy;
+          this.iter--;
+          c.fillStyle = this.col;
+          c.globalAlpha = this.alpha;
+          c.fillRect(this.x, this.y, this.parent.size, this.parent.size);
+        }
+      }
+
+      class Stain {
+        constructor(x = innerWidth, y = innerHeight) {
+          this.x = x;
+          this.y = y;
+          this.size = 1;
+          this.rad = Math.random();
+          this.dots = {};
+          this.dotId = 1;
+          this.to = 1;
+          this.R = Math.random() * 100;
+          this.dir = Math.random() * 100;
+          this.v = 0;
+          this.colors = 0;
+          this.colorChoose = "black";
+        }
+        draw() {
+          const circ = this.rad;
+          this.rad -= this.v;
+          this.step = circ;
+          for (let i = 1; i <= this.R; i += this.S) {
+            if (this.colors % 3 == 0) {
+              this.colorChoose = "yellow";
+            } else if (this.colors % 2) {
+              this.colorChoose = "red";
+            } else if (this.colors % 5) {
+              this.colorChoose = "green";
+            } else {
+              this.colorChoose = "black";
+            }
+            let t = this.dir;
+            let x = this.x;
+            let y = this.y;
+            this.dots[this.dotId] = new Dot(
+              this.dotId,
+              x,
+              y,
+              t,
+              this,
+              this.colorChoose
+            );
+            this.dotId++;
+            this.colors++;
+            for (let i in this.dots) {
+              this.dots[i].draw();
+            }
+          }
+        }
+      }
+
+      let ss = [new Stain()];
+      function loop() {
+        if (Math.random() < 0.05) {
+          ss.push(
+            new Stain(Math.random() * innerWidth, Math.random() * innerHeight)
+          );
+        }
+        ss.forEach((s) => s.draw());
+        requestAnimationFrame(loop);
+      }
+      loop();
+    </script>
+  </body>
+</html>
